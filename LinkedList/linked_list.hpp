@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 template <typename T>
 class LinkedNode
@@ -11,10 +12,14 @@ public:
   LinkedNode(T val, LinkedNode *next);
 
   LinkedNode *insert(int pos, T val);
+
   LinkedNode *find(T val);
-  LinkedNode *updated(int pos, T val);
+  int find_position(T val);
+
+  LinkedNode *update(int pos, T val);
   LinkedNode *sort();
   LinkedNode *merge();
+  std::vector<T> to_vector();
   void traverse();
   void remove_at(int pos);
 };
@@ -44,6 +49,21 @@ void LinkedNode<T>::traverse()
 }
 
 template <typename T>
+std::vector<T> LinkedNode<T>::to_vector()
+{
+  LinkedNode *node = this;
+  std::vector<T> vec;
+
+  while (node != nullptr)
+  {
+    vec.push_back(node->value);
+    node = node->next;
+  }
+
+  return vec;
+}
+
+template <typename T>
 LinkedNode<T> *LinkedNode<T>::insert(int pos, T val)
 {
   LinkedNode *node = this;
@@ -58,4 +78,55 @@ LinkedNode<T> *LinkedNode<T>::insert(int pos, T val)
   node->next = new LinkedNode(val, temp_node);
 
   return node->next;
+}
+
+template <typename T>
+LinkedNode<T> *LinkedNode<T>::find(T val)
+{
+  LinkedNode *node = this;
+
+  while (node != nullptr)
+  {
+    if (node->value == val)
+      break;
+    node = node->next;
+  }
+
+  return node;
+}
+
+template <typename T>
+int LinkedNode<T>::find_position(T val)
+{
+  LinkedNode *node = this;
+  int pos = 0;
+
+  while (node != nullptr)
+  {
+    if (node->value == val)
+      break;
+
+    node = node->next;
+    pos++;
+  }
+
+  return pos;
+}
+
+template <typename T>
+LinkedNode<T> *LinkedNode<T>::update(int pos, T val)
+{
+  LinkedNode *node = this;
+
+  while (pos > 0 && node != nullptr)
+  {
+    node = node->next;
+    pos--;
+  }
+
+  if (node == nullptr)
+    return nullptr;
+
+  node->value = val;
+  return node;
 }
