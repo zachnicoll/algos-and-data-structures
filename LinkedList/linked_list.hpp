@@ -20,6 +20,9 @@ public:
 
   LinkedNode *update(int pos, T val);
   static void sort(LinkedNode<T> *node, int left, int right);
+
+  void sort_linear();
+
   std::vector<T> to_vector();
   void traverse();
   void remove_at(int pos);
@@ -167,77 +170,105 @@ LinkedNode<T> *LinkedNode<T>::at(int position)
 }
 
 template <typename T>
-void LinkedNode<T>::sort(LinkedNode<T> *node, int left, int right)
+void LinkedNode<T>::sort_linear()
 {
-  if (left < right)
+  bool sorted = false;
+
+  while (!sorted)
   {
-    int mid = left + (right - left) / 2;
+    LinkedNode *node = this;
+    bool local_sorted = true;
 
-    sort(node, left, mid);
-    sort(node, mid + 1, right);
+    while (node->next != nullptr)
+    {
+      if (node->value > node->next->value)
+      {
+        T temp = node->value;
+        node->value = node->next->value;
+        node->next->value = temp;
 
-    LinkedNode::merge(node, left, mid, right);
+        local_sorted = false;
+      }
+
+      node = node->next;
+    }
+
+    sorted = local_sorted;
   }
 }
 
-template <typename T>
-void LinkedNode<T>::merge(LinkedNode<T> *node, int left, int mid, int right)
-{
-  int l1 = mid - left + 1;
-  int l2 = right - mid;
-  LinkedNode<T> *L = nullptr;
-  LinkedNode<T> *R = nullptr;
+// template <typename T>
+// void LinkedNode<T>::sort(LinkedNode<T> *node, int left, int right)
+// {
+//   if (left < right)
+//   {
+//     int mid = left + (right - left) / 2;
 
-  for (int i = 0; i < l1; i++)
-  {
-    if (L == nullptr)
-      L = new LinkedNode(node->at(i)->value);
-    else
-      L->append(node->at(i)->value);
-  }
+//     sort(node, left, mid);
+//     sort(node, mid + 1, right);
 
-  node->traverse();
+//     LinkedNode::merge(node, left, mid, right);
+//   }
+// }
 
-  for (int i = 0; i < l2; i++)
-  {
-    if (R == nullptr)
-      R = new LinkedNode(node->at(mid + i + 1)->value);
-    else
-      R->append(node->at(mid + i + 1)->value);
-  }
+// template <typename T>
+// void LinkedNode<T>::merge(LinkedNode<T> *node, int left, int mid, int right)
+// {
+//   int l1 = mid - left + 1;
+//   int l2 = right - mid;
+//   LinkedNode<T> *L = nullptr;
+//   LinkedNode<T> *R = nullptr;
 
-  int i = 0, j = 0, k = left;
+//   for (int i = 0; i < l1; i++)
+//   {
+//     if (L == nullptr)
+//       L = new LinkedNode(node->at(i)->value);
+//     else
+//       L->append(node->at(i)->value);
+//   }
 
-  while (i < l1 && j < l2)
-  {
-    LinkedNode *right_node = R->at(j);
-    LinkedNode *left_node = L->at(i);
+//   node->traverse();
 
-    if (left_node->value <= right_node->value)
-    {
-      node->at(k)->value = left_node->value;
-      i++;
-    }
-    else
-    {
-      node->at(k)->value = right_node->value;
-      j++;
-    }
+//   for (int i = 0; i < l2; i++)
+//   {
+//     if (R == nullptr)
+//       R = new LinkedNode(node->at(mid + i + 1)->value);
+//     else
+//       R->append(node->at(mid + i + 1)->value);
+//   }
 
-    k++;
-  }
+//   int i = 0, j = 0, k = left;
 
-  while (i < l1)
-  {
-    node->at(k)->value = L->at(i)->value;
-    i++;
-    k++;
-  }
+//   while (i < l1 && j < l2)
+//   {
+//     LinkedNode *right_node = R->at(j);
+//     LinkedNode *left_node = L->at(i);
 
-  while (j < l2)
-  {
-    node->at(k)->value = R->at(j)->value;
-    j++;
-    k++;
-  }
-}
+//     if (left_node->value <= right_node->value)
+//     {
+//       node->at(k)->value = left_node->value;
+//       i++;
+//     }
+//     else
+//     {
+//       node->at(k)->value = right_node->value;
+//       j++;
+//     }
+
+//     k++;
+//   }
+
+//   while (i < l1)
+//   {
+//     node->at(k)->value = L->at(i)->value;
+//     i++;
+//     k++;
+//   }
+
+//   while (j < l2)
+//   {
+//     node->at(k)->value = R->at(j)->value;
+//     j++;
+//     k++;
+//   }
+// }
