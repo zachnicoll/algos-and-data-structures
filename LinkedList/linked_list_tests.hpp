@@ -2,6 +2,11 @@
 
 void linked_list_tests()
 {
+  std::cout << "----------------------------------------" << std::endl;
+  std::cout << "\tLinked List" << std::endl;
+  std::cout << "----------------------------------------" << std::endl
+            << std::endl;
+
   LinkedNode<int> *linked_list = new LinkedNode(10);
 
   linked_list->append(9);
@@ -18,7 +23,7 @@ void linked_list_tests()
   std::cout << "Linked List takes the form: " << std::endl;
   linked_list->traverse();
 
-  auto found_node = linked_list->find(6);
+  auto found_node = linked_list->find(10);
   std::cout << "\nFound node with value: " << found_node->value << std::endl;
 
   auto found_node_pos = linked_list->find_position(found_node->value);
@@ -34,7 +39,7 @@ void linked_list_tests()
   linked_list->traverse();
 
   std::cout << "\nSorting linked list with merge sort..." << std::endl;
-  linked_list = linked_list->sort(); // Not sure how to maintain the original objects pointer, so just re-assign to the merged ptr
+  linked_list = linked_list->sort();
   linked_list->traverse();
 
   std::cout << "\nConverting linked list to vector..." << std::endl;
@@ -44,4 +49,15 @@ void linked_list_tests()
   for (auto x : list_as_vector)
     std::cout << " " << x << " ";
   std::cout << "]" << std::endl;
+
+  std::cout << "\nPrepending value to linked list..." << std::endl;
+  linked_list = linked_list->prepend(99);
+  linked_list->traverse();
+
+  std::cout << "\nTrying to remove head node..." << std::endl;
+  linked_list->remove_at(0);
+
+  std::cout << "Removing node at position 1..." << std::endl;
+  linked_list->remove_at(1);
+  linked_list->traverse();
 }

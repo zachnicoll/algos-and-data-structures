@@ -5,20 +5,73 @@ template <typename T>
 class LinkedNode
 {
 public:
+  /**
+   * Value of the node (generic).
+   */
   T value;
+
+  /**
+   * Pointer to next node in the Linked List.
+   */
   LinkedNode<T> *next;
 
+  /**
+   * Construct a LinkedNode with the given value, and next = nullptr.
+   */
   LinkedNode(T val);
+
+  /**
+   * Construct a LinkedNode with the given value and next ptr.
+   */
   LinkedNode(T val, LinkedNode *next);
 
-  LinkedNode *insert(int pos, T val);
-  LinkedNode *append(T val);
+  /**
+   * Insert a node at the given position AFTER this node (0 is the next node),
+   * with the provided value.
+   */
+  void insert(int pos, T val);
 
+  /**
+   * Append a node to the end of this linked list.
+   */
+  void append(T val);
+
+  /**
+   * Preprend a node to start of this list, assuming this is the head node.
+   * @returns The new head of the list
+   */
+  LinkedNode *prepend(T val);
+
+  /**
+   * Find the first node with a given value.
+   * @returns Ptr to the first node with a given value
+   */
   LinkedNode *find(T val);
-  LinkedNode *at(int position);
+
+  /**
+   * Find the position of the first node with a given value.
+   * Position refers to the number of nodes after this node, that the value occurs.
+   * A positions of 0 is this node.
+   * @returns Position of next node with given value
+   */
   int find_position(T val);
 
-  LinkedNode *update(int pos, T val);
+  /**
+   * Get a ptr to the node at a given position, where 0 is the current node
+   * @returns Ptr to node at given position in the linked list
+   */
+  LinkedNode *at(int position);
+
+  /**
+   * Updates the node at a given position's value. Position refers to number of nodes
+   * after this node, where 0 is this node.
+   */
+  void update(int pos, T val);
+
+  /**
+   * Sorts all nodes with a merge sort divide-and-conquer algorithm in O(nlog(n)) time.
+   * @returns Ptr to new head of the linked list
+   */
   LinkedNode<T> *sort();
 
   /**
@@ -27,10 +80,23 @@ public:
    * Worst case: O(n^2)
    * Best case: O(n)
    */
-  void sort_linear();
+  void sort_slow();
 
+  /**
+   * Convert the linked list into a vector of type T
+   * @returns Vector containing all values of type T from the linked list
+   */
   std::vector<T> to_vector();
+
+  /**
+   * Print all nodes in the linked list in order.
+   */
   void traverse();
+
+  /**
+   * Delete a node at a given position after the current node, where 0 is this node.
+   * This node cannot be removed, and so a minimum of pos = 1 should be passed to this function.
+   */
   void remove_at(int pos);
 
 private:
@@ -78,7 +144,7 @@ std::vector<T> LinkedNode<T>::to_vector()
 }
 
 template <typename T>
-LinkedNode<T> *LinkedNode<T>::insert(int pos, T val)
+void LinkedNode<T>::insert(int pos, T val)
 {
   LinkedNode *node = this;
 
@@ -90,8 +156,6 @@ LinkedNode<T> *LinkedNode<T>::insert(int pos, T val)
   LinkedNode<T> *temp_node = node->next;
 
   node->next = new LinkedNode(val, temp_node);
-
-  return node->next;
 }
 
 template <typename T>
@@ -105,6 +169,9 @@ LinkedNode<T> *LinkedNode<T>::find(T val)
       break;
     node = node->next;
   }
+
+  if (node == nullptr)
+    std::cout << "Could not find a node with that value!" << std::endl;
 
   return node;
 }
@@ -128,7 +195,7 @@ int LinkedNode<T>::find_position(T val)
 }
 
 template <typename T>
-LinkedNode<T> *LinkedNode<T>::update(int pos, T val)
+void LinkedNode<T>::update(int pos, T val)
 {
   LinkedNode *node = this;
 
@@ -139,14 +206,13 @@ LinkedNode<T> *LinkedNode<T>::update(int pos, T val)
   }
 
   if (node == nullptr)
-    return nullptr;
+    return;
 
   node->value = val;
-  return node;
 }
 
 template <typename T>
-LinkedNode<T> *LinkedNode<T>::append(T val)
+void LinkedNode<T>::append(T val)
 {
   LinkedNode<T> *node = this;
 
@@ -155,21 +221,23 @@ LinkedNode<T> *LinkedNode<T>::append(T val)
     node = node->next;
   }
 
-  LinkedNode *new_node = new LinkedNode(val);
-  node->next = new_node;
+  node->next = new LinkedNode(val);
+}
 
-  return new_node;
+template <typename T>
+LinkedNode<T> *LinkedNode<T>::prepend(T val)
+{
+  return new LinkedNode(val, this);
 }
 
 template <typename T>
 LinkedNode<T> *LinkedNode<T>::at(int position)
 {
   LinkedNode<T> *node = this;
-  int curr_pos = 0;
 
-  while (curr_pos < position && node != nullptr)
+  while (position > 0 && node != nullptr)
   {
-    curr_pos++;
+    position--;
     node = node->next;
   }
 
@@ -177,7 +245,7 @@ LinkedNode<T> *LinkedNode<T>::at(int position)
 }
 
 template <typename T>
-void LinkedNode<T>::sort_linear()
+void LinkedNode<T>::sort_slow()
 {
   bool sorted = false;
 
@@ -208,13 +276,16 @@ template <typename T>
 int LinkedNode<T>::get_middle_node()
 {
   int list_length = 0;
-  LinkedNode<T> *node = this;
+  LinkedNode<T> *fast_ptr = this->next;
 
-  while (node != nullptr)
+  while (fast_ptr != nullptr && fast_ptr->next != nullptr)
   {
     list_length++;
-    node = node->next;
+    fast_ptr = fast_ptr->next->next;
   }
+
+  if (fast_ptr == nullptr)
+    list_length++;
 
   return list_length / 2;
 }
@@ -290,4 +361,34 @@ LinkedNode<T> *LinkedNode<T>::merge(LinkedNode<T> *x, LinkedNode<T> *y)
   }
 
   return head->next;
+}
+
+template <typename T>
+void LinkedNode<T>::remove_at(int pos)
+{
+  LinkedNode<T> *node = this;
+  LinkedNode<T> *temp = nullptr;
+
+  if (pos == 0)
+  {
+    std::cout << "\nWARNING: Attempted to remove head node, exiting LinkedNode::remove_at early.\n"
+              << std::endl;
+    return;
+  }
+
+  while (pos > 0 && node != nullptr)
+  {
+    if (pos == 1)
+    {
+      temp = node;
+    }
+    pos--;
+
+    node = node->next;
+  }
+
+  auto temp2 = node->next;
+  temp->next = temp2;
+
+  delete node;
 }
