@@ -19,8 +19,14 @@ public:
   int find_position(T val);
 
   LinkedNode *update(int pos, T val);
-  static void sort(LinkedNode<T> *node, int left, int right);
+  LinkedNode<T> *sort();
 
+  /**
+   * Sorts all nodes from the current node (this), to the node with a next value of nullptr.
+   * Utilizes a linear iteration approach, examining each element of the list until it's sorted.
+   * Worst case: O(n^2)
+   * Best case: O(n)
+   */
   void sort_linear();
 
   std::vector<T> to_vector();
@@ -28,7 +34,8 @@ public:
   void remove_at(int pos);
 
 private:
-  static void merge(LinkedNode<T> *node, int left, int mid, int right);
+  static LinkedNode<T> *merge(LinkedNode<T> *x, LinkedNode<T> *y);
+  int get_middle_node();
 };
 
 template <typename T>
@@ -197,78 +204,90 @@ void LinkedNode<T>::sort_linear()
   }
 }
 
-// template <typename T>
-// void LinkedNode<T>::sort(LinkedNode<T> *node, int left, int right)
-// {
-//   if (left < right)
-//   {
-//     int mid = left + (right - left) / 2;
+template <typename T>
+int LinkedNode<T>::get_middle_node()
+{
+  int list_length = 0;
+  LinkedNode<T> *node = this;
 
-//     sort(node, left, mid);
-//     sort(node, mid + 1, right);
+  while (node != nullptr)
+  {
+    list_length++;
+    node = node->next;
+  }
 
-//     LinkedNode::merge(node, left, mid, right);
-//   }
-// }
+  return list_length / 2;
+}
 
-// template <typename T>
-// void LinkedNode<T>::merge(LinkedNode<T> *node, int left, int mid, int right)
-// {
-//   int l1 = mid - left + 1;
-//   int l2 = right - mid;
-//   LinkedNode<T> *L = nullptr;
-//   LinkedNode<T> *R = nullptr;
+template <typename T>
+LinkedNode<T> *LinkedNode<T>::sort()
+{
+  if (this->next == nullptr)
+    // List only has one node, nothing to sort
+    return this;
 
-//   for (int i = 0; i < l1; i++)
-//   {
-//     if (L == nullptr)
-//       L = new LinkedNode(node->at(i)->value);
-//     else
-//       L->append(node->at(i)->value);
-//   }
+  if (this->next->next == nullptr)
+  {
+    // List only has two nodes, compare & sort them
+    if (this->value > this->next->value)
+    {
+      T temp = this->value;
+      this->value = this->next->value;
+      this->next->value = temp;
+    }
 
-//   node->traverse();
+    return this;
+  }
 
-//   for (int i = 0; i < l2; i++)
-//   {
-//     if (R == nullptr)
-//       R = new LinkedNode(node->at(mid + i + 1)->value);
-//     else
-//       R->append(node->at(mid + i + 1)->value);
-//   }
+  int middle_pos = this->get_middle_node();
 
-//   int i = 0, j = 0, k = left;
+  LinkedNode<T> *left_list = this;
+  LinkedNode<T> *last_node_in_left_list = this->at(middle_pos - 1);
 
-//   while (i < l1 && j < l2)
-//   {
-//     LinkedNode *right_node = R->at(j);
-//     LinkedNode *left_node = L->at(i);
+  LinkedNode<T> *right_list = last_node_in_left_list->next;
 
-//     if (left_node->value <= right_node->value)
-//     {
-//       node->at(k)->value = left_node->value;
-//       i++;
-//     }
-//     else
-//     {
-//       node->at(k)->value = right_node->value;
-//       j++;
-//     }
+  // Break the left and right lists' connection to each other
+  last_node_in_left_list->next = nullptr;
 
-//     k++;
-//   }
+  LinkedNode<T> *merged = LinkedNode::merge(left_list->sort(), right_list->sort());
+  return merged;
+}
 
-//   while (i < l1)
-//   {
-//     node->at(k)->value = L->at(i)->value;
-//     i++;
-//     k++;
-//   }
+template <typename T>
+LinkedNode<T> *LinkedNode<T>::merge(LinkedNode<T> *x, LinkedNode<T> *y)
+{
+  LinkedNode<T> *merged = new LinkedNode(0);
+  auto head = merged;
 
-//   while (j < l2)
-//   {
-//     node->at(k)->value = R->at(j)->value;
-//     j++;
-//     k++;
-//   }
-// }
+  while (x != nullptr && y != nullptr)
+  {
+    if (x->value <= y->value)
+    {
+      merged->next = x;
+      x = x->next;
+    }
+    else
+    {
+      merged->next = y;
+      y = y->next;
+    }
+
+    merged = merged->next;
+  }
+
+  while (x != nullptr)
+  {
+    merged->next = x;
+    x = x->next;
+    merged = merged->next;
+  }
+
+  while (y != nullptr)
+  {
+    merged->next = y;
+    y = y->next;
+    merged = merged->next;
+  }
+
+  return head->next;
+}
