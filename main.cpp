@@ -3,5 +3,13 @@
 
 int main()
 {
-  linked_list_tests();
+  try
+  {
+    linked_list_tests();
+  }
+  catch (NotEqualExcpetion e)
+  {
+    std::cout << "Linked List tests failed!\n"
+              << e.what() << std::endl;
+  }
 }
